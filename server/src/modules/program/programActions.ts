@@ -28,34 +28,104 @@ const programs = [
 import type { RequestHandler } from "express";
 import programRepository from "./programRepository";
 
-const browse: RequestHandler = async (req, res) => {
-  const programsFromDB = await programRepository.readAll();
+const browse: RequestHandler = async (req, res, next) => {
+  try {
+    const programsFromDB = await programRepository.readAll();
 
-  if (req.query.q != null) {
-    const filteredPrograms = programsFromDB.filter((program) =>
-      program.synopsis
-        .toLowerCase()
-        .includes(req.query.q?.toString().toLowerCase() as string),
-    );
+    const { q } = req.query;
 
-    res.json(filteredPrograms);
-  } else {
-    res.json(programsFromDB);
+    if (q != null) {
+      const filteredPrograms = programsFromDB.filter((program) =>
+        program.synopsis
+          .toLowerCase()
+          .includes(q.toString().toLowerCase() as string),
+      );
+
+      if (filteredPrograms.length === 0) {
+        res.sendStatus(404);
+      } else {
+        res.json(filteredPrograms);
+      }
+    } else {
+      res.json(programsFromDB);
+    }
+  } catch (error) {
+    next(error);
   }
 };
 
-const read: RequestHandler = (req, res) => {
-  const parsedId = Number.parseInt(req.params.id);
+const read: RequestHandler = async (req, res, next) => {
+  try {
+    const programsFromDB = await programRepository.readAll();
+    const parsedId = Number.parseInt(req.params.id);
 
-  const program = programs.find((p) => p.id === parsedId);
+    const program = programsFromDB.find((p) => p.id === parsedId);
 
-  if (program != null) {
-    res.json(program);
-  } else {
-    res.sendStatus(404);
+    if (program != null) {
+      res.json(program);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const edit: RequestHandler = async (req, res, next) => {
+  try {
+    const program = {
+      id: req.body.id,
+      title: req.body.title,
+      synopsis: req.body.synopsis,
+      poster: req.body.poster,
+      country: req.body.country,
+      year: req.body.year,
+      category_id: req.body.category_id,
+    };
+
+    const affectedRows = await programRepository.update(program);
+
+    if (affectedRows === 0) {
+      res.sendStatus(404);
+    } else {
+      res.sendStatus(204);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+const add: RequestHandler = async (req, res, next) => {
+  try {
+    const newProgram = {
+      title: req.body.title,
+      synopsis: req.body.synopsis,
+      poster: req.body.poster,
+      country: req.body.country,
+      year: req.body.year,
+      category_id: req.body.category_id,
+    };
+
+    const insertId = await programRepository.create(newProgram);
+
+    res.status(201).json({ insertId });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const destroy: RequestHandler = async (req, res, next) => {
+  try {
+    const programId = Number.parseInt(req.params.id);
+
+    await programRepository.delete(programId);
+
+    res.sendStatus(204);
+  } catch (error) {
+    next(error);
   }
 };
 
 // Export them to import them somewhere else
 
-export default { browse, read };
+export default { browse, read, edit, add, destroy };
