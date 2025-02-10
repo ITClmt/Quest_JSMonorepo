@@ -26,16 +26,21 @@ const programs = [
 // Declare the actions
 
 import type { RequestHandler } from "express";
+import programRepository from "./programRepository";
 
-const browse: RequestHandler = (req, res) => {
+const browse: RequestHandler = async (req, res) => {
+  const programsFromDB = await programRepository.readAll();
+
   if (req.query.q != null) {
-    const filteredPrograms = programs.filter((program) =>
-      program.synopsis.includes(req.query.q as string),
+    const filteredPrograms = programsFromDB.filter((program) =>
+      program.synopsis
+        .toLowerCase()
+        .includes(req.query.q?.toString().toLowerCase() as string),
     );
 
     res.json(filteredPrograms);
   } else {
-    res.json(programs);
+    res.json(programsFromDB);
   }
 };
 
