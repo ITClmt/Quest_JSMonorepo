@@ -1,27 +1,27 @@
 // Some data to make the trick
 
-const programs = [
-  {
-    id: 1,
-    title: "The Good Place",
-    synopsis:
-      "À sa mort, Eleanor Shellstrop est envoyée au Bon Endroit, un paradis fantaisiste réservé aux individus exceptionnellement bienveillants. Or Eleanor n'est pas exactement une « bonne personne » et comprend vite qu'il y a eu erreur sur la personne. Avec l'aide de Chidi, sa prétendue âme sœur dans l'au-delà, la jeune femme est bien décidée à se redécouvrir.",
-    poster:
-      "https://img.betaseries.com/JwRqyGD3f9KvO_OlfIXHZUA3Ypw=/600x900/smart/https%3A%2F%2Fpictures.betaseries.com%2Ffonds%2Fposter%2F94857341d71c795c69b9e5b23c4bf3e7.jpg",
-    country: "USA",
-    year: 2016,
-  },
-  {
-    id: 2,
-    title: "Dark",
-    synopsis:
-      "Quatre familles affolées par la disparition d'un enfant cherchent des réponses et tombent sur un mystère impliquant trois générations qui finit de les déstabiliser.",
-    poster:
-      "https://img.betaseries.com/zDxfeFudy3HWjxa6J8QIED9iaVw=/600x900/smart/https%3A%2F%2Fpictures.betaseries.com%2Ffonds%2Fposter%2Fc47135385da176a87d0dd9177c5f6a41.jpg",
-    country: "Allemagne",
-    year: 2017,
-  },
-];
+// const programs = [
+//   {
+//     id: 1,
+//     title: "The Good Place",
+//     synopsis:
+//       "À sa mort, Eleanor Shellstrop est envoyée au Bon Endroit, un paradis fantaisiste réservé aux individus exceptionnellement bienveillants. Or Eleanor n'est pas exactement une « bonne personne » et comprend vite qu'il y a eu erreur sur la personne. Avec l'aide de Chidi, sa prétendue âme sœur dans l'au-delà, la jeune femme est bien décidée à se redécouvrir.",
+//     poster:
+//       "https://img.betaseries.com/JwRqyGD3f9KvO_OlfIXHZUA3Ypw=/600x900/smart/https%3A%2F%2Fpictures.betaseries.com%2Ffonds%2Fposter%2F94857341d71c795c69b9e5b23c4bf3e7.jpg",
+//     country: "USA",
+//     year: 2016,
+//   },
+//   {
+//     id: 2,
+//     title: "Dark",
+//     synopsis:
+//       "Quatre familles affolées par la disparition d'un enfant cherchent des réponses et tombent sur un mystère impliquant trois générations qui finit de les déstabiliser.",
+//     poster:
+//       "https://img.betaseries.com/zDxfeFudy3HWjxa6J8QIED9iaVw=/600x900/smart/https%3A%2F%2Fpictures.betaseries.com%2Ffonds%2Fposter%2Fc47135385da176a87d0dd9177c5f6a41.jpg",
+//     country: "Allemagne",
+//     year: 2017,
+//   },
+// ];
 
 // Declare the actions
 
@@ -134,16 +134,46 @@ const validate: RequestHandler = (req, res, next) => {
 
   const errors: ValidationError[] = [];
 
-  const { name } = req.body;
+  const { title, synopsis, poster, country, year, category_id } = req.body;
 
   // put your validation rules here
-  if (name == null) {
-    errors.push({ field: "name", message: "The field is required" });
-  } else if (name.length > 255) {
+  if (title == null) {
+    errors.push({ field: "title", message: "Title is required" });
+  } else if (title.length > 255) {
     errors.push({
-      field: "name",
-      message: "Should contain less than 255 characters",
+      field: "title",
+      message: "Title must be less than 255 characters",
     });
+  }
+
+  if (synopsis == null) {
+    errors.push({ field: "synopsis", message: "Synopsis is required" });
+  } else if (synopsis.length > 1000) {
+    errors.push({
+      field: "synopsis",
+      message: "Synopsis must be less than 1000 characters",
+    });
+  }
+
+  if (poster == null) {
+    errors.push({ field: "poster", message: "Poster is required" });
+  }
+
+  if (country == null) {
+    errors.push({ field: "country", message: "Country is required" });
+  } else if (country.length > 255) {
+    errors.push({
+      field: "country",
+      message: "Country must be less than 255 characters",
+    });
+  }
+
+  if (year == null) {
+    errors.push({ field: "year", message: "Year is required" });
+  }
+
+  if (category_id == null) {
+    errors.push({ field: "category_id", message: "Category is required" });
   }
 
   if (errors.length === 0) {
